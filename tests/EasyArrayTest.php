@@ -5,6 +5,16 @@ use PHPUnit\Framework\TestCase;
 
 class EasyArrayTest extends TestCase
 {
+
+    public function testFlatten()
+    {
+        $array = new EasyArray([[5, 6], [7, [8, 9]]]);
+
+        $flat = $array->flatten();
+
+        $this->assertCount(5, $flat->values());
+    }
+
     public function testGet()
     {
         $array = new EasyArray([5,6,7,8]);

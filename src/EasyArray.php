@@ -111,9 +111,27 @@ class EasyArray implements \ArrayAccess, \Iterator
         return new self($filteredItems);
     }
 
-    public function flatten(): self
+    public function flatten(int $levels = 5): self
     {
+        $flat = [];
 
+        foreach($this->items as $value) {
+            if(is_array($value) && $levels >= 1) {
+
+                if ($levels >= 1) {
+                    $easy = new self($value);
+                    $flat = array_merge($flat, $easy->flatten($levels - 1)->values());
+
+                } else {
+                    $flat[] = $value;
+                }
+
+            } else {
+                $flat[] = $value;
+            }
+        }
+
+        return new self($flat);
     }
 
     public function reverse()
@@ -127,6 +145,11 @@ class EasyArray implements \ArrayAccess, \Iterator
     }
 
     public function unshift()
+    {
+
+    }
+
+    public function sort(): self
     {
 
     }

@@ -22,6 +22,7 @@ Recursively clones array $items calling clone() on each of its items
 
 New instance
 
+
 #### `map(\Closure $closure): self`
 
 Applies given callback to each element of stored array
@@ -33,6 +34,7 @@ If instance has strict set to true, new instance will have type infered from fir
 
 Returns new instance of EasyArray, with new collection.
 
+
 #### `walk(\Closure $closure): self`
 
 Applies callback to each element of internally stored array
@@ -42,6 +44,7 @@ TypeError is thrown when strinct is true, and type returned by provided closure 
 ##### Return value
 
 Current instance of EasyArray
+
 
 #### `find(\Closure $closure): self`
 
@@ -53,6 +56,7 @@ If no values satisfy the testing function, null is returned.
 
 Item found on array or null
 
+
 #### `findIndex(\Closure $closure): self`
 
 Provided closure return values are evaluated as truthy of falsy.
@@ -63,6 +67,7 @@ If no values satisfy the testing function, null is returned.
 
 Index found on array or null
 
+
 #### `filter(\Closure $closure): self`
 
 Provided closure return values are evaluated as truthy of falsy.
@@ -72,14 +77,16 @@ Remove items form array that do no satisfy the provided filter function.
 
 Current of EasyArray with filtered items.
 
+
 #### `filtered(\Closure $closure): self`
 
 Provided closure return values are evaluated as truthy of falsy.
-Forms a new array with elements that satisfy the provided filter function.
+Instantiates a new EasyArray with elements that satisfy the provided filter function.
 
 ##### Return value
 
 New instance of EasyArray with new array of filtered items.
+
 
 #### `flattened(int $levels = 5): self`
 
@@ -89,6 +96,7 @@ Does not preserve keys.
 ##### Return value
 
 New instance of EasyArray with flattened items.
+
 
 #### `flatten(int $levels = 5): self`
 

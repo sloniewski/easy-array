@@ -1,5 +1,9 @@
 # easy-array
-Easy to use array wrapper for PHP 
+Easy to use array wrapper for PHP. EasyArray constructor accepts additional param 'strict', if set to true all values added to the array with methods push(), set(), merge() and offesetSet() will be checked in they match type of other elements existing on the internally stored array. 
+
+Instantiating EasyArray with 'strict' set to true, and array of elements of different types will result in TypeError.
+
+When using search functions such as contains() or includes() no iteration on internally stored array will be done if type of provided param does not match the type stored on EasyArray.
 
 ## Installation
 
@@ -35,7 +39,7 @@ Returns new instance of EasyArray, with new collection.
 
 Applies callback to each element of internally stored array
 
-TypeError is thrown when strinct is true, and type returned by provided closure does not match the type set on array.
+TypeError is thrown when strinct is true, and type returned by provided closure does not match the type set on array. When TypeError is thrown, the internally stored array remains unmodified.
 
 ##### Return value
 

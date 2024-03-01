@@ -1,9 +1,7 @@
 # easy-array
-Easy to use array wrapper for PHP. EasyArray constructor accepts additional param 'strict', if set to true all values added to the array with methods push(), set(), merge() and offesetSet() will be checked in they match type of other elements existing on the internally stored array. 
+Easy to use array wrapper for PHP. EasyArray constructor accepts additional param 'strict', if set to true all values added to the array with methods push(), set(), merge() and offesetSet() will be checked in they match type of other elements existing on the internally stored array. Instantiating EasyArray with 'strict' set to true and array of elements of different types will result in TypeError.
 
-Instantiating EasyArray with 'strict' set to true, and array of elements of different types will result in TypeError.
-
-When using search functions such as contains() or includes() no iteration on internally stored array will be done if type of provided param does not match the type stored on EasyArray.
+When using search functions such as contains() or includes() no iteration will be done if type of provided param does not match the type stored on EasyArray.
 
 ## Installation
 
@@ -64,3 +62,41 @@ If no values satisfy the testing function, null is returned.
 ##### Return value
 
 Index found on array or null
+
+#### `filter(\Closure $closure): self`
+
+Provided closure return values are evaluated as truthy of falsy.
+Remove items form array that do no satisfy the provided filter function.
+
+##### Return value
+
+Current of EasyArray with filtered items.
+
+#### `filtered(\Closure $closure): self`
+
+Provided closure return values are evaluated as truthy of falsy.
+Forms a new array with elements that satisfy the provided filter function.
+
+##### Return value
+
+New instance of EasyArray with new array of filtered items.
+
+#### `flattened(int $levels = 5): self`
+
+Recursively flatten the nested arrays, and returns new instance of EasyArray. Depth of recursion is set by param levels.
+Does not preserve keys.
+
+##### Return value
+
+New instance of EasyArray with flattened items.
+
+#### `flatten(int $levels = 5): self`
+
+Recursively flattens the nested arrays by modifiing the stored array. Depth of recursion is set by param levels.
+Does not preserve keys.
+
+##### Return value
+
+Current instance with flattened items.
+
+

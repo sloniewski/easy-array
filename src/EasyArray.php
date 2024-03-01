@@ -262,8 +262,27 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     public function filter(\Closure $callback): self
     {
         $filteredItems = [];
+        foreach($this->items as $key => $item) {
+            if (boolval(call_user_func($callback, $item))) {
+                $filteredItems[$key] = $item;
+            }
+        }
+
+        $this->items = $filteredItems;
+
+        return $this;
+    }
+
+    /**
+     * Remove items form array that do no satisfy the provided filter function.
+    * @param \Closure $callback
+    * @return self
+    */
+    public function filtered(\Closure $callback): self
+    {
+        $filteredItems = [];
         foreach($this->items as $item) {
-            if(boolval(call_user_func($callback, $item))) {
+            if (boolval(call_user_func($callback, $item))) {
                 $filteredItems[] = $item;
             }
         }
@@ -271,14 +290,18 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
         return $this->replicateSelfWith($filteredItems);
     }
 
-    public function flatten(int $levels = 5): self
+    /**
+     * Flattens the nested arrays, does not preserve keys
+     * @return self
+     */
+    public function flattened(int $levels = 5): self
     {
         $flat = [];
 
         foreach($this->items as $value) {
             if(is_array($value) && $levels >= 1) {
                 $easy = new self($value);
-                $flat = array_merge($flat, $easy->flatten($levels - 1)->values());
+                $flat = array_merge($flat, $easy->flattened($levels - 1)->values());
 
             } else {
                 $flat[] = $value;
@@ -286,6 +309,19 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
         }
 
         return $this->replicateSelfWith($flat);
+    }
+
+    /**
+     * Flattens the nested arrays by modifiing the stored array. Does not preserve keys.
+     * @return self
+     */
+    public function flatten(int $levels = 5): self
+    {
+        $flat = $this->flattened($levels);
+
+        $this->items = $flat->values();
+
+        return $this;
     }
 
     /**

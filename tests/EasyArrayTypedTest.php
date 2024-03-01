@@ -174,29 +174,48 @@ class EasyArrayTypedTest extends TestCase
         $secondMerge = $merged->merge($third);
     }
 
-
-    public function testDiffThrowTypeError()
+    public function testMapTypeInference()
     {
-
-    }
-
-    public function testIntersectThrowTypeError()
-    {
-
+        $array = new EasyArray(['1', '2', '3'], true);
+        $mapped = $array->map(function (string $item): int {
+            return intval($item);
+        });
+        $this->assertInstanceOf(EasyArray::class, $mapped);
+        $this->assertEquals('integer', $mapped->getType()->getTypeName());
     }
 
     public function testMapClosureReturningWrongType()
     {
-
+        $this->expectException(\TypeError::class);
+        $array = new EasyArray(['a', 'b', 'c'], true);
+        $array->map(function (string $item) {
+            if($item == "b") {
+                return 1;
+            } else {
+                return $item;
+            }
+        });
     }
+
     public function testWalkClosureReturningWrongType()
     {
-
+        $this->expectException(\TypeError::class);
+        $array = new EasyArray(['a', 'b', 'c'], true);
+        $array->walk(function (string $item) {
+            if($item == "b") {
+                return 1;
+            } else {
+                return $item;
+            }
+        });
     }
 
-    public function testIncludesOtherType()
+    public function testContainsOtherType()
     {
+        $array = new EasyArray(['a', 'b', 'c'], true);
 
+        $this->assertTrue($array->contains("a"));
+        $this->assertFalse($array->contains(1));
     }
 
     public function testIncludesInOrderOtherType()

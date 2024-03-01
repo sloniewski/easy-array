@@ -208,7 +208,7 @@ class EasyArrayTest extends TestCase
 
     public function testMap()
     {
-        $array = new EasyArray(['a', 'b']);
+        $array = new EasyArray([3 => 'a', 4 => 'b']);
 
         $mapped = $array->map(
             function(string $item) {
@@ -220,6 +220,7 @@ class EasyArrayTest extends TestCase
 
         $this->assertInstanceOf(EasyArray::class, $mapped);
         $this->assertEquals($lastVal, 'bb');
+        $this->assertEquals($mapped->get(3), 'aa');
     }
 
     public function testFilter()
@@ -477,5 +478,17 @@ class EasyArrayTest extends TestCase
     public function testRotateNegative()
     {
         
+    }
+
+    public function testPurge()
+    {
+        $array = new EasyArray([1,2,3,4,5]);
+        $array->purge();
+        $this->assertCount(0, $array->items());
+    }
+
+    public function testClonePreservesKeys()
+    {
+
     }
 }

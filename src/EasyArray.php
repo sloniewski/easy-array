@@ -164,29 +164,58 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
      * Apply callback to each element of stored array
      * returns new instance of EasyArray
      * 
+     * If instance has strict set to true, new instance will 
+     * have type infered from first call of provided closure, all subsequent items are expected to have the same type
+     * TypeError will be thrown if types of next items do not match the type of first item
+     * 
+     * @throws \TypeError
      * @param \Closure $closure
      * @return self
      */
     public function map(\Closure $closure): self
     {
-        return $this->replicateSelfWith(
-            array_map(
-                $closure,
-                $this->items
-            )
-        );
+        $mapped = $this->replicateSelfWith([]);
+
+        foreach($this->items as $key => $item) {
+            $newItem = call_user_func($closure, $item);
+            $mapped->set($key, $newItem);
+        }
+
+        return $mapped;
     }
 
     /**
-     * Apply callback to each element of array
+     * Apply callback to each element of internally stored array
+     * 
+     * TypeError is thrown when strinct is true, 
+     * and type returned by provided closure does not match the type set on array
+     * 
+     * @throws \TypeError
      * @param \Closure $closure
      * @return self
      */
     public function walk(\Closure $closure): self
     {
-        foreach($this->items as $key => $item) {
-            $this->items[$key] = call_user_func($closure, $item);
+        $itemsWalked = [];
+
+        foreach($this->items() as $key => $item) {
+            $newItem = call_user_func($closure, $item);
+
+            if($this->isTyped()
+                && !$this->hasSameTypeAs($newItem)
+            ) {
+                throw new \Excetion(
+                    "Type returned by provided closure does not match the type set, expected: "
+                    . $this->getType()->getTypeName()
+                    . ", recived: "
+                    . $this->typeFactory->make($newItem)->getTypeName()
+                );
+            }
+            
+            $itemsWalked[$key] = $newItem; 
         }
+
+        $this->items = $itemsWalked;
 
         return $this;
     }
@@ -240,11 +269,6 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
         }
 
         return $this->replicateSelfWith($filteredItems);
-    }
-
-    public function filterNull(): self
-    {
-        
     }
 
     public function flatten(int $levels = 5): self
@@ -318,7 +342,7 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
         if($this->isTyped()
             && !$this->hasSameTypeAs($other)
         ) {
-            throw new \TypeError("Types of provided array does not match the stored type.");
+            return $this->replicateSelfWith([]);
         }
 
         return $this->replicateSelfWith(
@@ -337,7 +361,7 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
         if($this->isTyped()
             && !$this->hasSameTypeAs($other)
         ) {
-            throw new \TypeError("Types of provided array does not match the stored type.");
+            return $this->replicateSelfWith([]);
         }
 
         return $this->replicateSelfWith(
@@ -480,6 +504,13 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
                 $preserveKeys
             )
         );
+    }
+
+    public function purge(): self
+    {
+        $this->items = [];
+
+        return $this;
     }
 
     /**

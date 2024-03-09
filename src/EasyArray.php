@@ -6,6 +6,7 @@ namespace EasyArray;
 use EasyArray\Cloner\Cloner;
 use EasyArray\TypeFactory\TypeFactory;
 use EasyArray\TypeFactory\Type;
+use EasyArray\ArrayUtils\ArrayUtils;
 
 class EasyArray implements \ArrayAccess, \Iterator, \Countable
 {
@@ -27,6 +28,15 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     /** @var Cloner */
     private $cloner;
 
+    /** @var ArrayUtils */
+    private $arrayUtils;
+
+    /** @var bool */ 
+    private $cloneItemsOnReplicate = false;
+
+    /** @var bool */
+    private $allowNulls = false;
+
     /**
      * When $strict is true, constructor will throw a TypeError 
      * if all items in $items are not the same type
@@ -43,6 +53,7 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     ){
         $this->cloner = new Cloner();
         $this->typeFactory = new TypeFactory();
+        $this->arrayUtils = new ArrayUtils;
 
         $this->items = $items;
         $this->strict = $strict;
@@ -65,8 +76,9 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * Returns an instance clone, also clones array internally stored items array 
-     * calling clone() on each of its items
+     * Creates a new instance of EasyArray by cloning internal array of $items. 
+     * Items are cloned by recursively calling clone() on each element. 
+     * The predefined clone depth is 5 levels.
      * @return self
      */
     public function clone()
@@ -116,7 +128,8 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * Add item at the end of the array
+     * Add element at the end of the array, if $strict is true (set in constructor), 
+     * will throw a TypeError if item do not match the type of other elements in the array.
      * 
      * @param mixed $item
      * @return self
@@ -144,7 +157,8 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * Set element stored under given index to a provided value
+     * Set element stored under given index to a provided value, if $strict is true (set in constructor), 
+     * will throw a TypeError if item do not match the type of other elements in the array.
      * 
      * @return self
      */
@@ -261,14 +275,7 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
       */
     public function filter(\Closure $callback): self
     {
-        $filteredItems = [];
-        foreach($this->items as $key => $item) {
-            if (boolval(call_user_func($callback, $item))) {
-                $filteredItems[$key] = $item;
-            }
-        }
-
-        $this->items = $filteredItems;
+        $this->items = $this->arrayUtils->filterArray($callback, $this->items);
 
         return $this;
     }
@@ -280,14 +287,9 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     */
     public function filtered(\Closure $callback): self
     {
-        $filteredItems = [];
-        foreach($this->items as $item) {
-            if (boolval(call_user_func($callback, $item))) {
-                $filteredItems[] = $item;
-            }
-        }
-
-        return $this->replicateSelfWith($filteredItems);
+        return $this->replicateSelfWith(
+            $this->arrayUtils->filterArray($callback, $this->items)
+        );
     }
 
     /**
@@ -296,17 +298,7 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
      */
     public function flattened(int $levels = 5): self
     {
-        $flat = [];
-
-        foreach($this->items as $value) {
-            if(is_array($value) && $levels >= 1) {
-                $easy = new self($value);
-                $flat = array_merge($flat, $easy->flattened($levels - 1)->values());
-
-            } else {
-                $flat[] = $value;
-            }
-        }
+        $flat = $this->arrayUtils->flattenArray($this->items, $levels);
 
         return $this->replicateSelfWith($flat);
     }
@@ -317,11 +309,27 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
      */
     public function flatten(int $levels = 5): self
     {
-        $flat = $this->flattened($levels);
-
-        $this->items = $flat->values();
+        $this->items = $this->arrayUtils->flattenArray($this->items, $levels);
 
         return $this;
+    }
+
+    /**
+     * @return int|float
+     */
+    public function sum(string $attribute)
+    {
+
+    }
+
+    public function reduce(): self
+    {
+        return $this;
+    }
+
+    public function reduced(): self
+    {
+        
     }
 
     /**
@@ -474,14 +482,29 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
 
     public function keySort(?\Closure $sortFunc = null): self
     {
+        if(is_null($sortFunc)) {
+            ksort($this->items);
+        } else {
+            uksort($this->items, $sortFunc);
+        }
 
+        return $this;
+    }
+
+    public function keySorted(?\Closure $sortFunc = null): self
+    {
+        $newInstance = $this->replicateSelfWith(
+            $this->items
+        );
+
+        return $newInstance->keySort($sortFunc);
     }
 
     /**
      * Sorts the stored array using the provided function, if not function is provided
-     * if no sorting function is provided php build-in sort() is called
+     * if no sorting function is provided php build-in sort() is called (asc order)
      * 
-     * sorted array does not retain previous keys
+     * Sorted array does not retain previous keys.
      * 
      * The comparison function must return an integer less than, equal to, or greater than zero 
      * if the first argument is considered to be respectively less than, equal to, or greater than the second.
@@ -504,7 +527,7 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
      * Creates new instance and sorts the array with provided callback
      * if no sorting function is provided php build-in sort() is called
      * 
-     * sorted array does not retain previous keys
+     * Sorted array does not retain previous keys
      * 
      * @param ?\Closure $sortFunc
      */
@@ -916,6 +939,12 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
             return;
         }
 
+        if ($this->allowNulls
+            && is_null($value)
+        ) {
+            return;
+        }
+
         if ($this->hasTypeSet()
             && !$this->hasSameTypeAsValue($value)
         ) {
@@ -928,6 +957,10 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
 
     private function replicateSelfWith(array $items = []): self
     {
+        if($this->cloneItemsOnReplicate) {
+            return new self($this->clonet->clone($items), $this->isTyped());
+        }
+
         return new self($items, $this->isTyped());
     }
 }

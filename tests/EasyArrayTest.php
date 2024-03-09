@@ -221,6 +221,7 @@ class EasyArrayTest extends TestCase
         $this->assertInstanceOf(EasyArray::class, $mapped);
         $this->assertEquals($lastVal, 'bb');
         $this->assertEquals($mapped->get(3), 'aa');
+        $this->assertNotSame($array, $mapped);
     }
 
     public function testFilter()
@@ -235,6 +236,24 @@ class EasyArrayTest extends TestCase
         $this->assertCount(2, $filteredArray->items());
         $this->assertContains(2, $filteredArray->items());
         $this->assertContains(4, $filteredArray->items());
+        $this->assertInstanceOf(EasyArray::class, $filteredArray);
+        $this->assertSame($array, $filteredArray);
+    }
+
+    public function testFiltered()
+    {
+        $array = new EasyArray([1,2,3,4]);
+
+        $filteredArray = $array->filtered(
+            function(int $item) {
+                return ($item % 2) == 0;
+            });
+
+        $this->assertCount(2, $filteredArray->items());
+        $this->assertContains(2, $filteredArray->items());
+        $this->assertContains(4, $filteredArray->items());
+        $this->assertInstanceOf(EasyArray::class, $filteredArray);
+        $this->assertNotSame($array, $filteredArray);
     }
 
     public function testIterable()
@@ -245,6 +264,21 @@ class EasyArrayTest extends TestCase
         foreach($array as $key => $value) {
             $this->assertEquals($value, $items[$key]);
         }
+    }
+
+    public function testReduce()
+    {
+
+    }
+
+    public function testReduced()
+    {
+
+    }
+
+    public function testSum()
+    {
+
     }
 
     public function testValues()
@@ -322,9 +356,26 @@ class EasyArrayTest extends TestCase
 
         $sorted = $array->sort();
 
-        $this->assertEquals(0,$array->items[0]);
-        $this->assertEquals(5, $array->items[5]);
+        $this->assertEquals(0,$sorted->items[0]);
+        $this->assertEquals(5,$sorted->items[5]);
         $this->assertInstanceOf(EasyArray::class, $sorted);
+        $this->assertSame($array, $sorted);
+        $this->assertTrue($array === $sorted);
+    }
+
+    public function testSortedNoSortFuncProvided()
+    {
+        $array = new EasyArray([4,5,3,2,1,0]);
+
+        $sorted = $array->sorted();
+
+        $this->assertEquals(0,$sorted->items[0]);
+        $this->assertEquals(4,$array->items[0]);
+        $this->assertEquals(5,$sorted->items[5]);
+        $this->assertEquals(0,$array->items[5]);
+        $this->assertInstanceOf(EasyArray::class, $sorted);
+        $this->assertNotSame($array, $sorted);
+        $this->assertFalse($array === $sorted);
     }
 
     public function testSortIntegersByFunction()
@@ -359,6 +410,7 @@ class EasyArrayTest extends TestCase
         $this->assertEquals('a',$array->items[6]);
         $this->assertEquals('z', $array->items[0]);
         $this->assertInstanceOf(EasyArray::class, $sorted);
+        $this->assertTrue($array === $sorted);
     }
 
     public function testSlice()
@@ -490,5 +542,15 @@ class EasyArrayTest extends TestCase
     public function testClonePreservesKeys()
     {
 
+    }
+
+    public function testKeySort()
+    {
+
+    }
+
+    public function testKeySorted()
+    {
+        
     }
 }

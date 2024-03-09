@@ -9,7 +9,12 @@ class TypeFactory
 {
     public function make($value): Type
     {
-        return (new Type($this->getTypeNameFrom($value)));
+        return (
+            new Type(
+                $this->getTypeNameFrom($value),
+                gettype($value) === "object"
+            )
+        );
     }
 
     /**

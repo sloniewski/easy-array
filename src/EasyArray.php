@@ -10,6 +10,10 @@ use EasyArray\ArrayUtils\ArrayUtils;
 
 class EasyArray implements \ArrayAccess, \Iterator, \Countable
 {
+    public const LESS = -1;
+    public const GREATER = 1;
+    public const EQUALS = 0;
+
     /** @var int */
     public $position;
 
@@ -104,6 +108,20 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     public function getType(): ?Type
     {
         return $this->type;
+    }
+
+    public function allowNulls(): self
+    {
+        $this->allowNulls = true;
+
+        return $this;
+    }
+
+    public function cloneItemsOnReplicate(): self
+    {
+        $this->cloneItemsOnReplicate = true;
+
+        return $this;
     }
 
     /**
@@ -958,7 +976,7 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     private function replicateSelfWith(array $items = []): self
     {
         if($this->cloneItemsOnReplicate) {
-            return new self($this->clonet->clone($items), $this->isTyped());
+            return new self($this->cloner->clone($items), $this->isTyped());
         }
 
         return new self($items, $this->isTyped());

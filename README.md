@@ -8,6 +8,21 @@ When using search functions such as contains() or includes() no iteration will b
 
 ## Installation
 
+## Usage
+
+Most method use fluent interface so you are able to chain methods on one EasyArray instance. eg:
+```php
+    $easyArray = new EasyArray([1,2,3,4]);
+    $x = $easyArray
+        ->map(function($item) { return $item * 2; })
+        ->reverse()
+        ->last()
+    ;
+    var_dump($x); // 2
+```
+
+Some methods allow to make copies of the array on the fly, you can tell the difference by naming conventions used. eg `flatten` return the current instance, and `flattend` returns a new instance of EasyArray. The same goes for `sort` and `sorted`, `fitler` and `filtered`, `reduce` and `reduced`. Although `flattend`, `sorted`, `filtered`, and `reduced` will return a new instance, the items collection is a just shallow copy, thus an array of objects will store reference to the same instances. You can force that new instance of EasyArray returned to have a cloned elements by calling EasyArray::cloneItemsOnReplicate() first. This is might make a significant difference in some cases.
+
 ## Instance public methods
 
 #### ` __construct(array<mixed> $items[, bool $strict = false ])`

@@ -131,6 +131,7 @@ class EasyArrayTest extends TestCase
         $array = new EasyArray([5,6,7,8]);
         $first = $array->first();
         $this->assertEquals(5, $first);
+        $this->assertCount(4, $array->items());
 
         $emptyArray = new EasyArray([]);
         $notFound = $emptyArray->first();
@@ -142,14 +143,17 @@ class EasyArrayTest extends TestCase
         $array = new EasyArray([0 => 5, 11 => 6, 14 => 7, 5 => 8]);
         $last = $array->last();
         $this->assertEquals(8, $last);
+        $this->assertCount(4, $array->items());
 
         $array_2 =  new EasyArray([5,6,7,8]);
         $last_2 = $array_2->last();
         $this->assertEquals(8, $last_2);
+        $this->assertCount(4, $array_2->items());
 
         $emptyArray = new EasyArray([]);
         $emptyVal = $emptyArray->last();
         $this->assertNull($emptyVal);
+        $this->assertCount(0, $emptyArray->items());
     }
 
     public function testFind()
@@ -180,6 +184,7 @@ class EasyArrayTest extends TestCase
         $this->assertEquals($walkedArray[0], 2);
         $this->assertEquals($walkedArray[1], 4);
         $this->assertEquals($walkedArray[2], 6);
+        $this->assertSame($array, $walked);
     }
 
     public function testCount()
@@ -384,10 +389,10 @@ class EasyArrayTest extends TestCase
 
         $sorter = function(int $first, int $second): int {
             if($first == $second) {
-                return 0;
+                return EasyArray::EQUALS;
             }
 
-            return $first < $second ? 1 : -1;
+            return $first < $second ? EasyArray::GREATER : EasyArray::LESS;
         };
 
         $sorted = $array->sort($sorter);
@@ -546,11 +551,52 @@ class EasyArrayTest extends TestCase
 
     public function testKeySort()
     {
+        $sorter = function(int $first, int $second): int {
+            if($first == $second) {
+                return EasyArray::EQUALS;
+            }
+
+            return $first < $second ? EasyArray::GREATER : EasyArray::LESS;
+        };
+
+    }
+
+    public function testKeySortWithSortFunc()
+    {
 
     }
 
     public function testKeySorted()
     {
-        
+
+    }
+
+    public function testKeySortedWithSortFunc()
+    {
+
+    }
+
+    public function testCloneOnReplicate()
+    {
+        $now = new \DateTime();
+
+        $array = new EasyArray([$now]);
+        $array->cloneItemsOnReplicate();
+        $flat = $array->flattened();
+
+        $this->assertNotSame($array->first(), $flat->first());
+        $this->assertNotSame($array, $flat);
+    }
+
+    public function testNotCloneItemsOnReplicate()
+    {
+        $now = new \DateTime();
+
+        $array = new EasyArray([$now]);
+
+        $flat = $array->flattened();
+
+        $this->assertSame($array->first(), $flat->first());
+        $this->assertNotSame($array, $flat);
     }
 }

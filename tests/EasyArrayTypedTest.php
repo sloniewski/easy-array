@@ -222,4 +222,14 @@ class EasyArrayTypedTest extends TestCase
     {
         
     }
+
+    public function testSumAttributes()
+    {
+        
+    }
+
+    public function testFailSumAttributes()
+    {
+
+    }
 }

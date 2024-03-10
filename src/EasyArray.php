@@ -66,6 +66,9 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
         if ($strict && count($items) >= 1) {
             foreach($items as $item) {
                 if (! $this->hasTypeSet()) {
+                    if (is_null($item)) {
+                        throw new \Exception("First item of typed array cannot be null.");
+                    }
                     $this->type = $this->typeFactory->make($item);
                 }
 
@@ -333,21 +336,48 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
+     * This method will attempt to add up all element of the array
+     * 
+     * @return float|int
+     */
+    public function sumValues()
+    {
+        return $this->reduce(
+            function($carry, $item) {
+                if(is_null($carry)) {
+                    return $item;
+                }
+                return $carry + $item;
+            },
+            null
+        );
+    }
+
+    /**
+     * This method will check if array contains objects, 
+     * if yes it will attempt to add up given properties of the objects
+     * 
      * @return int|float
      */
-    public function sum(string $attribute)
+    public function sumAttributes(string $attribute)
     {
+        if($this->isTyped()
+            && !$this->getType()->isObject()
+        ) {
+            throw new \TypeError("Cannot sum attributes, not an array of objects");
+        }
 
+        $sum = 0;
+        foreach($this->values() as $item) {
+            $sum += $item->$attribute;
+        }
+
+        return $sum;
     }
 
-    public function reduce(): self
+    public function reduce(\Closure $callback, $initial = null)
     {
-        return $this;
-    }
-
-    public function reduced(): self
-    {
-        
+        return array_reduce($this->values(), $callback, $initial);
     }
 
     /**

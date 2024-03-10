@@ -4,9 +4,15 @@ declare(strict_types=1);
 use EasyArray\EasyArray;
 use PHPUnit\Framework\TestCase;
 
+class TestClass {
+    public $value;
+    public function __construct($value) {
+        $this->value = $value;
+    }
+}
+
 class EasyArrayTest extends TestCase
 {
-
     public function offsetSet()
     {
         $array = new EasyArray([5,6,7,8]);
@@ -276,14 +282,28 @@ class EasyArrayTest extends TestCase
 
     }
 
-    public function testReduced()
+    public function testSumValues()
     {
+        $array = new EasyArray([
+            4 => 1, 
+            5 => 2,
+            6 => 3,
+            7 => 4,
+        ]);
 
+        $this->assertEquals(10, $array->sumValues());
     }
 
-    public function testSum()
+    public function testSumAttributes()
     {
+       $array = new EasyArray([
+            new TestClass(1), 
+            new TestClass(2), 
+            new TestClass(3), 
+            new TestClass(4), 
+        ]);
 
+        $this->assertEquals(10, $array->sumAttributes('value'));
     }
 
     public function testValues()

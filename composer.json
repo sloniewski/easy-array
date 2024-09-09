@@ -1,0 +1,19 @@
+{
+    "name": "sloniewski/easy-array",
+    "description": "Object oriented Array wrapper with batteries included",
+    "type": "library",
+    "license": "GPL-3.0",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "EasyArray\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    }
+}

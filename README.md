@@ -70,7 +70,7 @@ Returns a new instance of EasyArray with flattened items.
 
 Retrieves a value stored under given index, if not found null is returned
 
-### `getIndex($element)`
+### `getIndex(mixed $element): int|string|null`
 
 Return index of searched element.
 
@@ -86,7 +86,7 @@ Returns the array of common elements of two arrays
 
 Checks if both arrays have the same length and store elements which are equal in the same order.
 
-### `last()`
+### `last(): mixed`
 
 Fetch last element of array (unlike in pop() item ins not removed). Returns null if collection is empty.
 
@@ -165,11 +165,11 @@ Reverse the order of stored items collection.
 
 Returns new instance with reversed order of items.
 
-### `rotate()`
+### `(int $rotations): self`
 
 If the number of rotations is positive is equivalent to successively calling $array->push($array->shift()) or if the number is negative $array->unshift($array->pop()).
 
-### `slice()`
+### `slice(int $offset, ?int $length = null, bool $preserveKeys = false): self`
 
 Wrapper for php array_slice built-in function. Returns a slice of an array, wrapped in EasyArray if the offset is larger than the size of the array, an empty array is returned.
 

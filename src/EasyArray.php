@@ -16,7 +16,6 @@ class EasyArray implements \ArrayAccess, \Iterator, \Countable
     private Cloner $cloner;
     private ArrayUtils $arrayUtils;
     private bool $cloneItemsOnReplicate = false;
-    private bool $allowNulls = false;
 
     /**
      * @param array $items

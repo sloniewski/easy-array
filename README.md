@@ -3,6 +3,10 @@ Easy to use array wrapper for PHP. Adds lots of utility methods for all of your 
 
 ## Installation
 
+```bash
+composer require sloniewski/easy-array
+```
+
 ## Usage
 
 Most method use fluent interface so you are able to chain methods on one EasyArray instance. eg:
@@ -26,7 +30,7 @@ Creates a new instance of EasyArray by cloning internal array of $items. Items a
 
 Returns new instance of Easy array.
 
-### `count()`
+### `count(): int`
 
 Get the number of element in array. Zero is returned for empty array. Returns an integer, zero is returned for empty array.
 
@@ -34,7 +38,7 @@ Get the number of element in array. Zero is returned for empty array. Returns an
 
 Check if value is present in the array wrapper for php built-in in_array().
 
-### `diff(): self`
+### `diff(self $other): self`
 
 Returns a new instance with values in array that are not present in the other array
 
@@ -204,7 +208,7 @@ This method will attempt to add up all elements of the array
 
 This method will assume that array contains objects, it will attempt to add up given properties of the objects;
 
-### `values()`
+### `values(): array`
 
 Wrapper for php build in array_values().
 
